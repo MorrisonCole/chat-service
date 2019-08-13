@@ -4,6 +4,7 @@ plugins {
     base
     java
     id("com.google.protobuf") version("0.8.10")
+    id("com.gradle.build-scan") version("2.4")
 }
 
 allprojects {
@@ -55,4 +56,9 @@ protobuf {
             artifact = "io.grpc:protoc-gen-grpc-java:1.22.1"
         }
     }
+}
+
+buildScan {
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
 }
