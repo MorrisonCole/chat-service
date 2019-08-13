@@ -1,0 +1,25 @@
+/*
+* TODO
+*/
+
+syntax = "proto3";
+
+package morrisoncole.chat;
+
+import "google/protobuf/empty.proto";
+import "error.proto";
+import "user.proto";
+
+option java_package = "com.morrisoncole.chat";
+
+service LoginService {
+    rpc Login (LoginRequest) returns (LoginResponse) {} // TODO
+}
+
+message LoginRequest {
+    User user = 1; // TODO
+}
+
+message LoginResponse {
+    Error error = 1;
+}

@@ -1,0 +1,14 @@
+/*
+* TODO
+*/
+
+syntax = "proto3";
+
+package morrisoncole.chat;
+
+option java_package = "com.morrisoncole.chat";
+
+message Error {
+    string message = 1;
+    int32 code = 2;
+}

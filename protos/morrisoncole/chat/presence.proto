@@ -1,0 +1,26 @@
+/*
+* TODO
+*/
+
+syntax = "proto3";
+
+package morrisoncole.chat;
+
+import "google/protobuf/empty.proto";
+import "user.proto";
+
+option java_package = "com.morrisoncole.chat";
+
+service PresenceService {
+    rpc UpdatePresence (Presence) returns (google.protobuf.Empty) {} // TODO
+
+    rpc ListActiveUsers (google.protobuf.Empty) returns (ActiveUsers) {} // TODO
+}
+
+message Presence {
+    User user = 1; // TODO
+}
+
+message ActiveUsers {
+    repeated User users = 1; // TODO
+}

@@ -1,0 +1,21 @@
+/*
+* TODO
+*/
+
+syntax = "proto3";
+
+package morrisoncole.chat;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option java_package = "com.morrisoncole.chat";
+
+service MessageService {
+    rpc SendMessage (Message) returns (google.protobuf.Empty) {} // TODO
+}
+
+message Message {
+    string message = 1; // TODO
+    google.protobuf.Timestamp timestamp = 2; // TODO
+}

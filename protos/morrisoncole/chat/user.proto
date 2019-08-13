@@ -1,0 +1,13 @@
+/*
+* TODO
+*/
+
+syntax = "proto3";
+
+package morrisoncole.chat;
+
+option java_package = "com.morrisoncole.chat";
+
+message User {
+    string user_id = 1; // TODO
+}
