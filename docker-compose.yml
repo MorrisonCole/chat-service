@@ -3,9 +3,15 @@ version: "3"
 services:
   cache-service:
     build: ./cache
+    volumes:
+      - ./cache:/usr/src/chat/cache
 
   login-service:
     build: ./login
+    volumes:
+      - ./login:/usr/src/chat/login
 
   presence-service:
     build: ./presence
+    volumes:
+      - ./presence:/usr/src/chat/presence
