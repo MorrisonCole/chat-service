@@ -3,8 +3,8 @@ import com.google.protobuf.gradle.*
 plugins {
     base
     java
-    id("com.google.protobuf") version("0.8.10")
-    id("com.gradle.build-scan") version("2.4")
+    id("com.google.protobuf") version ("0.8.10")
+    id("com.gradle.build-scan") version ("2.4")
 }
 
 allprojects {
@@ -22,6 +22,7 @@ buildscript {
     }
 
     dependencies {
+        classpath("com.github.jengelman.gradle.plugins", "shadow", "5.1.0")
         classpath("com.google.protobuf", "protobuf-gradle-plugin", "0.8.10")
     }
 }
@@ -32,11 +33,6 @@ dependencies {
     subprojects.forEach { project ->
         archives(project)
     }
-}
-
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 sourceSets {
