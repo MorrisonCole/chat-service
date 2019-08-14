@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  cache-service:
+    build: ./cache
+
+  login-service:
+    build: ./login
+
+  presence-service:
+    build: ./presence
