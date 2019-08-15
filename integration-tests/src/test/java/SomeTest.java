@@ -17,6 +17,7 @@ class SomeTest {
             .withFileFromPath("Dockerfile", Paths.get("../cache/Dockerfile"))
     );
 
+    // TODO expose ports .withExposedPorts(50051)
     @Container
     public GenericContainer login = new GenericContainer<>(new ImageFromDockerfile()
             .withFileFromPath(".", Paths.get("../login"))
@@ -31,6 +32,11 @@ class SomeTest {
 
     @Test
     void someTestMethod() {
+        String address = login.getContainerIpAddress();
+        Integer port = login.getFirstMappedPort();
+        ChatClient chatClient = new ChatClient(address, port);
+        chatClient.SendMessage("Test");
+
         assertTrue(true);
     }
 }
