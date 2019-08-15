@@ -1,5 +1,4 @@
 plugins {
-    java
     application
     id("com.github.johnrengelman.shadow")
 }
@@ -9,7 +8,7 @@ application {
 }
 
 dependencies {
-    testCompile("junit", "junit", "4.12")
+    compile(project(":protos"))
 }
 
 configure<JavaPluginConvention> {

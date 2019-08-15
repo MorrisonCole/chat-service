@@ -3,3 +3,6 @@ A scalable chat service built with Java &amp; gRPC.
 
 # Build
 `./gradlew build`
+
+# Run
+`docker-compose up --build`
