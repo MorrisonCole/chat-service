@@ -1,1 +1,6 @@
-include("cache", "login", "presence")
+include(
+        "cache",
+        "login",
+        "presence",
+        "integration-tests"
+)
