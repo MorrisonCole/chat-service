@@ -23,6 +23,10 @@ configure<JavaPluginConvention> {
 
 tasks {
     test {
+        dependsOn(":cache:shadowJar")
+        dependsOn(":login:shadowJar")
+        dependsOn(":presence:shadowJar")
+
         useJUnitPlatform()
     }
 }
