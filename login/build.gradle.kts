@@ -23,11 +23,6 @@ dependencies {
     testCompile("org.testcontainers", "junit-jupiter", "1.12.0")
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 tasks {
     test {
         dependsOn(":login:shadowJar")
