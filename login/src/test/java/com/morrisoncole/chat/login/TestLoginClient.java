@@ -11,22 +11,20 @@ import io.grpc.ManagedChannelBuilder;
 
 class TestLoginClient {
 
-    private final ManagedChannel channel;
-
     private final LoginServiceStub loginServiceStub;
     private final LoginServiceBlockingStub loginServiceBlockingStub;
 
-    public TestLoginClient(String host, int port) {
+    TestLoginClient(String host, int port) {
         this(ManagedChannelBuilder.forAddress(host, port).usePlaintext());
     }
 
     private TestLoginClient(ManagedChannelBuilder<?> channelBuilder) {
-        channel = channelBuilder.build();
+        ManagedChannel channel = channelBuilder.build();
         loginServiceBlockingStub = LoginServiceGrpc.newBlockingStub(channel);
         loginServiceStub = LoginServiceGrpc.newStub(channel);
     }
 
-    public void Login(String userId) {
+    boolean Login(String userId) {
         User user = User.newBuilder()
                 .setUserId(userId)
                 .build();
@@ -35,5 +33,6 @@ class TestLoginClient {
                 .build();
 
         Login.LoginResponse response = loginServiceBlockingStub.login(loginRequest);
+        return !response.hasError();
     }
 }
