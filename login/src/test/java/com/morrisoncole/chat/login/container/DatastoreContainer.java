@@ -8,31 +8,40 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 public class DatastoreContainer extends GenericContainer<DatastoreContainer> {
 
-    private String projectName = "testing";
-    private int emulatorPort = 8888;
+    private static final String NETWORK_ALIAS = "datastore";
+    private static final int PORT = 8888;
+    private static final String PROJECT_NAME = "testing";
 
     public DatastoreContainer() {
         super("google/cloud-sdk:latest");
 
-        withExposedPorts(emulatorPort);
-        withNetworkAliases("datastore");
+        withExposedPorts(PORT);
+        withNetworkAliases(NETWORK_ALIAS);
         withCommand("/bin/sh",
                 "-c",
                 String.format("gcloud beta emulators datastore start --no-legacy --project %s --host-port=0.0.0.0:%d --consistency=1",
-                        projectName,
-                        emulatorPort)
+                        PROJECT_NAME,
+                        PORT)
         );
         waitingFor(Wait.forHttp(""));
     }
 
     public Datastore getDatastoreService() {
-        String host = String.format("%s:%d", getContainerIpAddress(), getMappedPort(emulatorPort));
+        String host = String.format("%s:%d", getContainerIpAddress(), getMappedPort(PORT));
 
         return DatastoreOptions.newBuilder()
-                .setProjectId(projectName)
+                .setProjectId(PROJECT_NAME)
                 .setHost(host)
                 .setCredentials(NoCredentials.getInstance())
                 .build()
                 .getService();
+    }
+
+    public String getProjectName() {
+        return PROJECT_NAME;
+    }
+
+    public String getHost() {
+        return String.format("http://%s:%d", NETWORK_ALIAS, PORT);
     }
 }

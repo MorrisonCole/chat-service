@@ -15,6 +15,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.file.Paths;
 
+import static com.morrisoncole.chat.login.Main.ENV_DATASTORE_HOST;
+import static com.morrisoncole.chat.login.Main.ENV_DATASTORE_PROJECT_ID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +44,9 @@ class LoginIntegrationTest {
             .withLogConsumer(LOG_CONSUMER)
             .withExposedPorts(50051)
             .waitingFor(Wait.forLogMessage(".*started.*", 1))
-            .withNetwork(network);
+            .withNetwork(network)
+            .withEnv(ENV_DATASTORE_PROJECT_ID, datastoreContainer.getProjectName())
+            .withEnv(ENV_DATASTORE_HOST, datastoreContainer.getHost());
 
     @BeforeEach
     void setup() {
