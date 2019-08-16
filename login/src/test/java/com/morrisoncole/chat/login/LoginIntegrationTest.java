@@ -1,11 +1,12 @@
 package com.morrisoncole.chat.login;
 
+import com.morrisoncole.chat.login.container.DatastoreContainer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
@@ -25,7 +26,14 @@ class LoginIntegrationTest {
 
     private static final String A_TEST_USER_ID = "a test userId";
 
+    private final Network network = Network.newNetwork();
+
     private TestLoginClient testLoginClient;
+
+    @Container
+    private DatastoreContainer datastoreContainer = new DatastoreContainer()
+            .withNetwork(network)
+            .withLogConsumer(LOG_CONSUMER);
 
     @Container
     private GenericContainer login = new GenericContainer<>(new ImageFromDockerfile()
@@ -33,7 +41,8 @@ class LoginIntegrationTest {
             .withFileFromPath("Dockerfile", Paths.get("./Dockerfile")))
             .withLogConsumer(LOG_CONSUMER)
             .withExposedPorts(50051)
-            .waitingFor(Wait.forLogMessage(".*started.*", 1));
+            .waitingFor(Wait.forLogMessage(".*started.*", 1))
+            .withNetwork(network);
 
     @BeforeEach
     void setup() {
@@ -51,7 +60,6 @@ class LoginIntegrationTest {
     }
 
     @Test
-    @Disabled
     void attemptToLoginWithTakenUserIdFails() {
         testLoginClient.Login(A_TEST_USER_ID);
         boolean secondUserLoggedIn = testLoginClient.Login(A_TEST_USER_ID);

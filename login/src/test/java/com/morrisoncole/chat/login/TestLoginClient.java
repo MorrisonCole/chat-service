@@ -15,11 +15,10 @@ class TestLoginClient {
     private final LoginServiceBlockingStub loginServiceBlockingStub;
 
     TestLoginClient(String host, int port) {
-        this(ManagedChannelBuilder.forAddress(host, port).usePlaintext());
-    }
-
-    private TestLoginClient(ManagedChannelBuilder<?> channelBuilder) {
-        ManagedChannel channel = channelBuilder.build();
+        ManagedChannel channel = ManagedChannelBuilder
+                .forAddress(host, port)
+                .usePlaintext()
+                .build();
         loginServiceBlockingStub = LoginServiceGrpc.newBlockingStub(channel);
         loginServiceStub = LoginServiceGrpc.newStub(channel);
     }
