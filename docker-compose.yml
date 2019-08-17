@@ -6,6 +6,15 @@ services:
 
   login-service:
     build: ./login
+    secrets:
+      - login_datastore_config
+      - login_datastore_credentials
 
   presence-service:
     build: ./presence
+
+secrets:
+  login_datastore_config:
+    file: ./.SECRET_LOGIN_DATASTORE_CONFIG
+  login_datastore_credentials:
+    file: ./.SECRET_CHAT_SERVICE_ACCOUNT.json

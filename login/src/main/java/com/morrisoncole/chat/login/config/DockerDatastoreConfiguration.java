@@ -1,36 +1,55 @@
 package com.morrisoncole.chat.login.config;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class DockerDatastoreConfiguration implements DatastoreConfiguration {
 
     public static final String SECRETS_DIR = "/run/secrets/";
-    public static final String PROJECT_ID_FILE_NAME = "PROJECT_ID";
-    public static final String HOST_FILE_NAME = "HOST";
+    public static final String DATASTORE_CONFIG_FILE_NAME = "login_datastore_config";
 
+    private static final String DATASTORE_CREDENTIALS_FILE_NAME = "login_datastore_credentials";
     private static final Logger LOGGER = Logger.getLogger(DockerDatastoreConfiguration.class.getName());
 
+    private final HashMap<String, String> configuration = new HashMap<>();
+
+    public DockerDatastoreConfiguration() {
+        try {
+            Scanner scanner = new Scanner(new File(SECRETS_DIR + DATASTORE_CONFIG_FILE_NAME));
+
+            while (scanner.hasNextLine()) {
+                String[] pair = scanner.nextLine().split("=");
+                LOGGER.warning("scanned" + pair[0]);
+                configuration.put(pair[0], pair[1]);
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.warning(e.getMessage());
+        }
+    }
+
+    @Nullable
     @Override
     public String getProjectId() {
-        return readFromFile(PROJECT_ID_FILE_NAME);
+        return configuration.getOrDefault("projectId", null);
+    }
+
+    @Nullable
+    @Override
+    public String getHost() {
+        return configuration.getOrDefault("host", null);
     }
 
     @Override
-    public String getHost() {
-        return readFromFile(HOST_FILE_NAME);
+    public boolean getUseCredentials() {
+        return Boolean.parseBoolean(configuration.getOrDefault("useCredentials", "false"));
     }
 
-    private String readFromFile(String fileName) {
-        String result = "";
-        try {
-            Scanner scanner = new Scanner(new File(SECRETS_DIR + fileName));
-            result = scanner.nextLine();
-        } catch (FileNotFoundException e) {
-            LOGGER.severe(e.getMessage());
-        }
-        return result;
+    @Override
+    public String getCredentialsPath() {
+        return SECRETS_DIR + DATASTORE_CREDENTIALS_FILE_NAME;
     }
 }
