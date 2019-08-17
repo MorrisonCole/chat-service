@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 public class DockerDatastoreConfiguration implements DatastoreConfiguration {
 
     public static final String SECRETS_DIR = "/run/secrets/";
-    public static final String DATASTORE_CONFIG_FILE_NAME = "login_datastore_config";
+    public static final String DATASTORE_CONFIG_FILE_NAME = "login-datastore-config";
 
-    private static final String DATASTORE_CREDENTIALS_FILE_NAME = "login_datastore_credentials";
+    private static final String DATASTORE_CREDENTIALS_FILE_NAME = "login-datastore-credentials";
     private static final Logger LOGGER = Logger.getLogger(DockerDatastoreConfiguration.class.getName());
 
     private final HashMap<String, String> configuration = new HashMap<>();

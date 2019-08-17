@@ -1,20 +1,23 @@
 version: "3.7"
 
 services:
-  cache-service:
-    build: ./cache
+#  cache-service:
+#    image: morrisoncole/chat-service:cache-service
+#    build: ./cache
 
   login-service:
+    image: morrisoncole/chat-service:login-service
     build: ./login
     secrets:
-      - login_datastore_config
-      - login_datastore_credentials
+      - login-datastore-config
+      - login-datastore-credentials
 
-  presence-service:
-    build: ./presence
+#  presence-service:
+#    image: morrisoncole/chat-service:presence-service
+#    build: ./presence
 
 secrets:
-  login_datastore_config:
+  login-datastore-config:
     file: ./.SECRET_LOGIN_DATASTORE_CONFIG
-  login_datastore_credentials:
+  login-datastore-credentials:
     file: ./.SECRET_CHAT_SERVICE_ACCOUNT.json
