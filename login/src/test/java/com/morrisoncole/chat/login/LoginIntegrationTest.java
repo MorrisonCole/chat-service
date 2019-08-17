@@ -12,11 +12,11 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.MountableFile;
 
 import java.nio.file.Paths;
 
-import static com.morrisoncole.chat.login.Main.ENV_DATASTORE_HOST;
-import static com.morrisoncole.chat.login.Main.ENV_DATASTORE_PROJECT_ID;
+import static com.morrisoncole.chat.login.config.DockerDatastoreConfiguration.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,20 +38,20 @@ class LoginIntegrationTest {
             .withLogConsumer(LOG_CONSUMER);
 
     @Container
-    private GenericContainer login = new GenericContainer<>(new ImageFromDockerfile()
+    private GenericContainer loginContainer = new GenericContainer<>(new ImageFromDockerfile()
             .withFileFromPath(".", Paths.get("./"))
             .withFileFromPath("Dockerfile", Paths.get("./Dockerfile")))
+            .withCopyFileToContainer(MountableFile.forClasspathResource(PROJECT_ID_FILE_NAME), SECRETS_DIR + PROJECT_ID_FILE_NAME)
+            .withCopyFileToContainer(MountableFile.forClasspathResource(HOST_FILE_NAME), SECRETS_DIR + HOST_FILE_NAME)
             .withLogConsumer(LOG_CONSUMER)
             .withExposedPorts(50051)
             .waitingFor(Wait.forLogMessage(".*started.*", 1))
-            .withNetwork(network)
-            .withEnv(ENV_DATASTORE_PROJECT_ID, datastoreContainer.getProjectName())
-            .withEnv(ENV_DATASTORE_HOST, datastoreContainer.getHost());
+            .withNetwork(network);
 
     @BeforeEach
     void setup() {
-        String address = login.getContainerIpAddress();
-        Integer port = login.getFirstMappedPort();
+        String address = loginContainer.getContainerIpAddress();
+        Integer port = loginContainer.getFirstMappedPort();
 
         testLoginClient = new TestLoginClient(address, port);
     }

@@ -36,12 +36,4 @@ public class DatastoreContainer extends GenericContainer<DatastoreContainer> {
                 .build()
                 .getService();
     }
-
-    public String getProjectName() {
-        return PROJECT_NAME;
-    }
-
-    public String getHost() {
-        return String.format("http://%s:%d", NETWORK_ALIAS, PORT);
-    }
 }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 public class LoginServer {
+
     private static final Logger LOGGER = Logger.getLogger(LoginServer.class.getName());
 
     private final Server server;
