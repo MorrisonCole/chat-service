@@ -8,14 +8,18 @@ package morrisoncole.chat;
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "morrisoncole/chat/user.proto";
 
 option java_package = "com.morrisoncole.chat";
 
 service MessageService {
     rpc SendMessage (Message) returns (google.protobuf.Empty) {} // TODO
+
+    rpc GetMessages (google.protobuf.Empty) returns (stream Message) {}
 }
 
 message Message {
     string message = 1; // TODO
     google.protobuf.Timestamp timestamp = 2; // TODO
+    User user = 3;
 }

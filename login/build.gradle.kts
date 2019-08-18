@@ -26,6 +26,8 @@ dependencies {
     testRuntimeOnly("org.slf4j", "slf4j-simple", "1.7.28")
     testCompile("org.testcontainers", "testcontainers", "1.12.0")
     testCompile("org.testcontainers", "junit-jupiter", "1.12.0")
+
+    testCompile("org.awaitility", "awaitility", "3.1.6")
 }
 
 tasks {

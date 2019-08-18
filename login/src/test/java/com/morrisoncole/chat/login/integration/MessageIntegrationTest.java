@@ -14,6 +14,11 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
@@ -59,6 +64,21 @@ class MessageIntegrationTest {
         testMessageClient.SendMessage("a random message");
 
         assertTrue(testMessageClient.successfullySentMessage());
+    }
+
+    @Test
+    void receivesHistoricalMessagesUponLogin() {
+        testLoginClient.Login(A_TEST_USER_ID);
+
+        TestMessageClient testMessageClient = new TestMessageClient(
+                presenceContainer.getContainerIpAddress(),
+                presenceContainer.getMappedPort(testLoginClient.getUserSessionPort()));
+
+        testMessageClient.GetMessages();
+
+        await().atMost(5, SECONDS).untilAsserted(() -> {
+            assertEquals("Initial message", testMessageClient.getReceivedMessage());
+        });
     }
 
     private TestLoginClient aTestLoginClient() {

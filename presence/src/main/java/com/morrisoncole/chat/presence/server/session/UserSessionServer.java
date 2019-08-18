@@ -26,5 +26,10 @@ class UserSessionServer extends GrpcServer {
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
+
+        @Override
+        public void getMessages(Empty request, StreamObserver<MessageOuterClass.Message> responseObserver) {
+            responseObserver.onNext(MessageOuterClass.Message.newBuilder().setMessage("Initial message").build());
+        }
     }
 }
