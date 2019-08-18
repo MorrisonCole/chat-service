@@ -10,6 +10,8 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class TestMessageClient {
@@ -20,7 +22,7 @@ public class TestMessageClient {
     private final MessageServiceBlockingStub messageServiceBlockingStub;
 
     private boolean sentMessage = false;
-    private final ArrayList<String> receivedMessages = new ArrayList<>();
+    private final List<String> receivedMessages = Collections.synchronizedList(new ArrayList<>());
 
     public TestMessageClient(String host, int port) {
         ManagedChannel channel = ManagedChannelBuilder
@@ -68,7 +70,7 @@ public class TestMessageClient {
         return sentMessage;
     }
 
-    public ArrayList<String> getReceivedMessages() {
+    public List<String> getReceivedMessages() {
         return receivedMessages;
     }
 }

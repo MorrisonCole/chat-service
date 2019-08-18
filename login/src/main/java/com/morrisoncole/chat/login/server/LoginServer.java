@@ -7,7 +7,7 @@ import com.morrisoncole.chat.Login;
 import com.morrisoncole.chat.LoginServiceGrpc.LoginServiceImplBase;
 import com.morrisoncole.chat.login.client.UserSessionOracleClient;
 import com.morrisoncole.chat.login.client.UserSessionOracleClientProvider;
-import com.morrisoncole.chat.login.schema.User;
+import com.morrisoncole.chat.schema.User;
 import com.morrisoncole.chat.server.GrpcServer;
 import io.grpc.stub.StreamObserver;
 

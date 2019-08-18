@@ -1,4 +1,4 @@
-package com.morrisoncole.chat.login.config;
+package com.morrisoncole.chat.config;
 
 import javax.annotation.Nullable;
 

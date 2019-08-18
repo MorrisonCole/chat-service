@@ -1,4 +1,4 @@
-package com.morrisoncole.chat.login.schema;
+package com.morrisoncole.chat.schema;
 
 public enum User {
     KIND("user"),

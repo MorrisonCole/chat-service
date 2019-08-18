@@ -6,7 +6,6 @@ import container.DatastoreContainer;
 import container.LoginContainer;
 import container.PresenceContainer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,12 @@ class MessageIntegrationTest {
     private TestLoginClient testLoginClient;
 
     @Container
-    private DatastoreContainer datastoreContainer = new DatastoreContainer("login")
+    private DatastoreContainer loginDatastoreContainer = new DatastoreContainer("login")
+            .withNetwork(network)
+            .withLogConsumer(LOG_CONSUMER);
+
+    @Container
+    private DatastoreContainer messageDatastoreContainer = new DatastoreContainer("message")
             .withNetwork(network)
             .withLogConsumer(LOG_CONSUMER);
 
@@ -70,7 +74,6 @@ class MessageIntegrationTest {
     }
 
     @Test
-    @Disabled
     void receivesHistoricalMessagesUponLogin() {
         testLoginClient.Login(A_TEST_USER_ID);
 
@@ -100,8 +103,10 @@ class MessageIntegrationTest {
         anotherTestMessageClient.getMessages();
 
         await().atMost(5, SECONDS).untilAsserted(() -> {
-            assertThat(testMessageClient.getReceivedMessages(), containsInRelativeOrder(expectedMessages));
+            assertThat(anotherTestMessageClient.getReceivedMessages(), equalTo(expectedMessages));
         });
+
+        assertThat(anotherTestMessageClient.getReceivedMessages(), equalTo(expectedMessages));
     }
 
     private TestLoginClient aTestLoginClient() {
