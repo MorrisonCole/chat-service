@@ -13,7 +13,7 @@ public class TestLoginClient {
     private final LoginServiceBlockingStub loginServiceBlockingStub;
 
     private boolean loggedIn;
-    private int port;
+    private int userSessionPort;
 
     public TestLoginClient(String host, int port) {
         ManagedChannel channel = ManagedChannelBuilder
@@ -38,14 +38,14 @@ public class TestLoginClient {
 
     private void bind(Login.LoginResponse response) {
         loggedIn = !response.hasError();
-        port = response.getPort();
+        userSessionPort = response.getPort();
     }
 
     public boolean isLoggedIn() {
         return loggedIn;
     }
 
-    public int getPort() {
-        return port;
+    public int getUserSessionPort() {
+        return userSessionPort;
     }
 }

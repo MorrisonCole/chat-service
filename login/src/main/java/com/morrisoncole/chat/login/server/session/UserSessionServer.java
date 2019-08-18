@@ -30,7 +30,7 @@ public class UserSessionServer implements GrpcServer {
     public void start() throws IOException {
         server.start();
 
-        LOGGER.info("Login server started!");
+        LOGGER.info("User session server started with port: " + server.getPort());
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             // Use stderr here since the logger may have been reset by its JVM shutdown hook.

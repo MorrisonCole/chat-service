@@ -24,8 +24,6 @@ class LoginAcceptanceTest {
 
     private final Network network = Network.newNetwork();
 
-    private TestLoginClient testLoginClient;
-
     @Container
     private DatastoreContainer datastoreContainer = new DatastoreContainer("login")
             .withNetwork(network)
@@ -36,26 +34,26 @@ class LoginAcceptanceTest {
             .withNetwork(network)
             .withLogConsumer(LOG_CONSUMER);
 
-    @BeforeEach
-    void setup() {
-        String address = loginContainer.getContainerIpAddress();
-        Integer port = loginContainer.getFirstMappedPort();
-
-        testLoginClient = new TestLoginClient(address, port);
-    }
-
     @Test
     void canHandleAtLeast1000RegisteredUsers() {
         int targetLoggedInUsers = 1000;
 
         int actualLoggedInUsers = 0;
         for (int i = 0; i < targetLoggedInUsers; i++) {
-            boolean loggedIn = testLoginClient.Login(UUID.randomUUID().toString());
-            if (loggedIn) {
+            TestLoginClient client = aTestLoginClient();
+            client.Login(UUID.randomUUID().toString());
+            if (client.isLoggedIn()) {
                 actualLoggedInUsers++;
             }
         }
 
         assertEquals(targetLoggedInUsers, actualLoggedInUsers);
+    }
+
+    private TestLoginClient aTestLoginClient() {
+        String address = loginContainer.getContainerIpAddress();
+        Integer port = loginContainer.getFirstMappedPort();
+
+        return new TestLoginClient(address, port);
     }
 }

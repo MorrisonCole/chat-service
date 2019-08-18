@@ -48,7 +48,7 @@ class LoginIntegrationTest {
         testLoginClient.Login(A_TEST_USER_ID);
 
         assertTrue(testLoginClient.isLoggedIn());
-        assertTrue(testLoginClient.getPort() > 0);
+        assertTrue(testLoginClient.getUserSessionPort() > 0);
     }
 
     @Test
