@@ -3,7 +3,6 @@ package com.morrisoncole.chat.login.integration;
 import client.TestLoginClient;
 import container.DatastoreContainer;
 import container.LoginContainer;
-import container.PresenceContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -17,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
-class LoginIntegrationTest {
+class MessageIntegrationTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginIntegrationTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageIntegrationTest.class);
     private static final Slf4jLogConsumer LOG_CONSUMER = new Slf4jLogConsumer(LOGGER);
 
     private static final String A_TEST_USER_ID = "a test userId";
@@ -36,11 +35,6 @@ class LoginIntegrationTest {
 
     @Container
     private LoginContainer loginContainer = new LoginContainer()
-            .withNetwork(network)
-            .withLogConsumer(LOG_CONSUMER);
-
-    @Container
-    private PresenceContainer presenceContainer = new PresenceContainer()
             .withNetwork(network)
             .withLogConsumer(LOG_CONSUMER);
 

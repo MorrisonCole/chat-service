@@ -5,68 +5,32 @@ import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.morrisoncole.chat.ErrorOuterClass;
 import com.morrisoncole.chat.Login;
 import com.morrisoncole.chat.LoginServiceGrpc.LoginServiceImplBase;
+import com.morrisoncole.chat.login.client.UserSessionOracleClient;
+import com.morrisoncole.chat.login.client.UserSessionOracleClientProvider;
 import com.morrisoncole.chat.login.schema.User;
-import com.morrisoncole.chat.login.server.session.UserSessionServer;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import com.morrisoncole.chat.server.GrpcServer;
 import io.grpc.stub.StreamObserver;
 
-import java.io.IOException;
-import java.util.Random;
 import java.util.logging.Logger;
 
-public class LoginServer implements GrpcServer {
+public class LoginServer extends GrpcServer {
 
     private static final Logger LOGGER = Logger.getLogger(LoginServer.class.getName());
 
-    private final Server server;
-
-    public LoginServer(Datastore datastore, int port) {
-        this.server = ServerBuilder
-                .forPort(port)
-                .addService(new LoginService(datastore))
-                .build();
-    }
-
-    @Override
-    public void start() throws IOException {
-        server.start();
-
-        LOGGER.info("Login server started!");
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // Use stderr here since the logger may have been reset by its JVM shutdown hook.
-            System.err.println("*** shutting down gRPC server since JVM is shutting down");
-            LoginServer.this.stop();
-            System.err.println("*** server shut down");
-        }));
-    }
-
-    @Override
-    public void stop() {
-        if (server != null) {
-            server.shutdown();
-        }
-    }
-
-    /**
-     * Await termination on the main thread since the grpc library uses daemon threads.
-     */
-    @Override
-    public void blockUntilShutdown() throws InterruptedException {
-        if (server != null) {
-            server.awaitTermination();
-        }
+    public LoginServer(Datastore datastore, int port, UserSessionOracleClientProvider userSessionOracleClientProvider) {
+        super(new LoginService(datastore, userSessionOracleClientProvider), port);
     }
 
     private static class LoginService extends LoginServiceImplBase {
 
         private final Datastore datastore;
+        private final UserSessionOracleClientProvider userSessionOracleClientProvider;
         private final KeyFactory keyFactory;
-        private int lastUsedPort = 50999;
 
-        LoginService(Datastore datastore) {
+        LoginService(Datastore datastore, UserSessionOracleClientProvider userSessionOracleClientProvider) {
             this.datastore = datastore;
+            this.userSessionOracleClientProvider = userSessionOracleClientProvider;
+
             keyFactory = datastore.newKeyFactory().setKind(User.KIND.toString());
         }
 
@@ -79,24 +43,24 @@ public class LoginServer implements GrpcServer {
                 return;
             }
 
+            UserSessionOracleClient userSessionOracleClient = userSessionOracleClientProvider
+                    .getInstance();
+
+            if (userSessionOracleClient == null) {
+                respondWithError(responseObserver);
+                return;
+            }
+
+            Login.LoginResponse loginResponse = userSessionOracleClient
+                    .startSession(request);
+
+            if (loginResponse.hasError()) {
+                respondWithError(responseObserver);
+                return;
+            }
+
             datastore.add(createUserWithId(userId));
-
-            int port = getFreePort();
-            new Thread(() -> {
-                try {
-                    UserSessionServer userSessionServer = new UserSessionServer(userId, port);
-                    userSessionServer.start();
-                    userSessionServer.blockUntilShutdown();
-                } catch (IOException | InterruptedException e) {
-                    LOGGER.severe("User session failed: " + e.getMessage());
-                }
-            }).start();
-
-            respondWithSuccess(responseObserver, port);
-        }
-
-        private int getFreePort() {
-            return lastUsedPort++; // TODO free up ports, this is obviously not going to last for long!
+            respondWithSuccess(responseObserver, loginResponse);
         }
 
         private boolean userExists(String userId) {
@@ -121,10 +85,8 @@ public class LoginServer implements GrpcServer {
                     .build();
         }
 
-        private void respondWithSuccess(StreamObserver<Login.LoginResponse> responseObserver, int port) {
-            responseObserver.onNext(Login.LoginResponse.newBuilder()
-                    .setPort(port)
-                    .build());
+        private void respondWithSuccess(StreamObserver<Login.LoginResponse> responseObserver, Login.LoginResponse response) {
+            responseObserver.onNext(response);
             responseObserver.onCompleted();
         }
     }

@@ -4,5 +4,6 @@ include(
         "presence",
         "protos",
         "acceptance-tests",
+        "common",
         "test-common"
 )

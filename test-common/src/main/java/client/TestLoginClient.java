@@ -32,7 +32,6 @@ public class TestLoginClient {
                 .build();
 
         Login.LoginResponse response = loginServiceBlockingStub.login(loginRequest);
-
         bind(response);
     }
 

@@ -3,6 +3,7 @@ package com.morrisoncole.chat.login;
 import com.google.cloud.NoCredentials;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
+import com.morrisoncole.chat.login.client.UserSessionOracleClientProvider;
 import com.morrisoncole.chat.login.config.DatastoreConfiguration;
 import com.morrisoncole.chat.login.config.DockerDatastoreConfiguration;
 import com.morrisoncole.chat.login.server.LoginServer;
@@ -34,7 +35,10 @@ public class Main {
                 .build()
                 .getService();
 
-        LoginServer loginServer = new LoginServer(datastoreService, 50051);
+        UserSessionOracleClientProvider userSessionOracleClientProvider = new UserSessionOracleClientProvider(
+                "presence",
+                50052);
+        LoginServer loginServer = new LoginServer(datastoreService, 50051, userSessionOracleClientProvider);
         loginServer.start();
         loginServer.blockUntilShutdown();
     }

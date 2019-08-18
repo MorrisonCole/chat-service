@@ -3,6 +3,7 @@ package com.morrisoncole.chat;
 import client.TestLoginClient;
 import container.DatastoreContainer;
 import container.LoginContainer;
+import container.PresenceContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -31,6 +32,11 @@ class LoginAcceptanceTest {
 
     @Container
     private LoginContainer loginContainer = new LoginContainer()
+            .withNetwork(network)
+            .withLogConsumer(LOG_CONSUMER);
+
+    @Container
+    private PresenceContainer presenceContainer = new PresenceContainer()
             .withNetwork(network)
             .withLogConsumer(LOG_CONSUMER);
 

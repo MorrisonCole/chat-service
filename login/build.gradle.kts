@@ -9,6 +9,7 @@ application {
 
 dependencies {
     compile(project(":protos"))
+    compile(project(":common"))
 
     compile("com.google.cloud", "google-cloud-datastore", "1.87.0")
 
@@ -30,6 +31,7 @@ dependencies {
 tasks {
     test {
         dependsOn(":login:shadowJar")
+        dependsOn(":presence:shadowJar")
 
         useJUnitPlatform()
     }
