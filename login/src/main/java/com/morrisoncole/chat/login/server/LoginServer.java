@@ -6,14 +6,16 @@ import com.morrisoncole.chat.ErrorOuterClass;
 import com.morrisoncole.chat.Login;
 import com.morrisoncole.chat.LoginServiceGrpc.LoginServiceImplBase;
 import com.morrisoncole.chat.login.schema.User;
+import com.morrisoncole.chat.login.server.session.UserSessionServer;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.logging.Logger;
 
-public class LoginServer {
+public class LoginServer implements GrpcServer {
 
     private static final Logger LOGGER = Logger.getLogger(LoginServer.class.getName());
 
@@ -26,6 +28,7 @@ public class LoginServer {
                 .build();
     }
 
+    @Override
     public void start() throws IOException {
         server.start();
 
@@ -39,6 +42,7 @@ public class LoginServer {
         }));
     }
 
+    @Override
     public void stop() {
         if (server != null) {
             server.shutdown();
@@ -48,6 +52,7 @@ public class LoginServer {
     /**
      * Await termination on the main thread since the grpc library uses daemon threads.
      */
+    @Override
     public void blockUntilShutdown() throws InterruptedException {
         if (server != null) {
             server.awaitTermination();
@@ -58,6 +63,7 @@ public class LoginServer {
 
         private final Datastore datastore;
         private final KeyFactory keyFactory;
+        private int lastUsedPort = 50999;
 
         LoginService(Datastore datastore) {
             this.datastore = datastore;
@@ -75,7 +81,22 @@ public class LoginServer {
 
             datastore.add(createUserWithId(userId));
 
-            respondWithSuccess(responseObserver);
+            int port = getFreePort();
+            new Thread(() -> {
+                try {
+                    UserSessionServer userSessionServer = new UserSessionServer(userId, port);
+                    userSessionServer.start();
+                    userSessionServer.blockUntilShutdown();
+                } catch (IOException | InterruptedException e) {
+                    LOGGER.severe("User session failed: " + e.getMessage());
+                }
+            }).start();
+
+            respondWithSuccess(responseObserver, port);
+        }
+
+        private int getFreePort() {
+            return lastUsedPort++; // TODO free up ports, this is obviously not going to last for long!
         }
 
         private boolean userExists(String userId) {
@@ -100,8 +121,10 @@ public class LoginServer {
                     .build();
         }
 
-        private void respondWithSuccess(StreamObserver<Login.LoginResponse> responseObserver) {
-            responseObserver.onNext(Login.LoginResponse.newBuilder().build());
+        private void respondWithSuccess(StreamObserver<Login.LoginResponse> responseObserver, int port) {
+            responseObserver.onNext(Login.LoginResponse.newBuilder()
+                    .setPort(port)
+                    .build());
             responseObserver.onCompleted();
         }
     }

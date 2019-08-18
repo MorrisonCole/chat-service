@@ -21,4 +21,5 @@ message LoginRequest {
 
 message LoginResponse {
     Error error = 1;
+    int32 port = 2;
 }

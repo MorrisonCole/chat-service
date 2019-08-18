@@ -40,32 +40,41 @@ class LoginIntegrationTest {
 
     @BeforeEach
     void setup() {
-        String address = loginContainer.getContainerIpAddress();
-        Integer port = loginContainer.getFirstMappedPort();
-
-        testLoginClient = new TestLoginClient(address, port);
+        testLoginClient = aTestLoginClient();
     }
 
     @Test
     void canLogin() {
-        boolean loggedIn = testLoginClient.Login(A_TEST_USER_ID);
+        testLoginClient.Login(A_TEST_USER_ID);
 
-        assertTrue(loggedIn);
+        assertTrue(testLoginClient.isLoggedIn());
+        assertTrue(testLoginClient.getPort() > 0);
     }
 
     @Test
     void attemptToLoginWithUsedUserIdFails() {
         testLoginClient.Login(A_TEST_USER_ID);
-        boolean secondUserLoggedIn = testLoginClient.Login(A_TEST_USER_ID);
 
-        assertFalse(secondUserLoggedIn);
+        TestLoginClient anotherTestLoginClient = aTestLoginClient();
+        anotherTestLoginClient.Login(A_TEST_USER_ID);
+
+        assertFalse(anotherTestLoginClient.isLoggedIn());
     }
 
     @Test
     void attemptToLoginWithUnusedUserIdSucceeds() {
         testLoginClient.Login(A_TEST_USER_ID);
-        boolean secondUserLoggedIn = testLoginClient.Login(ANOTHER_TEST_USER_ID);
 
-        assertTrue(secondUserLoggedIn);
+        TestLoginClient anotherTestLoginClient = aTestLoginClient();
+        anotherTestLoginClient.Login(ANOTHER_TEST_USER_ID);
+
+        assertTrue(anotherTestLoginClient.isLoggedIn());
+    }
+
+    private TestLoginClient aTestLoginClient() {
+        String address = loginContainer.getContainerIpAddress();
+        Integer port = loginContainer.getFirstMappedPort();
+
+        return new TestLoginClient(address, port);
     }
 }

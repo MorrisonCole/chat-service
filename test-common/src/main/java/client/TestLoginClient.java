@@ -12,6 +12,9 @@ public class TestLoginClient {
 
     private final LoginServiceBlockingStub loginServiceBlockingStub;
 
+    private boolean loggedIn;
+    private int port;
+
     public TestLoginClient(String host, int port) {
         ManagedChannel channel = ManagedChannelBuilder
                 .forAddress(host, port)
@@ -20,7 +23,7 @@ public class TestLoginClient {
         loginServiceBlockingStub = LoginServiceGrpc.newBlockingStub(channel);
     }
 
-    public boolean Login(String userId) {
+    public void Login(String userId) {
         User user = User.newBuilder()
                 .setUserId(userId)
                 .build();
@@ -29,6 +32,20 @@ public class TestLoginClient {
                 .build();
 
         Login.LoginResponse response = loginServiceBlockingStub.login(loginRequest);
-        return !response.hasError();
+
+        bind(response);
+    }
+
+    private void bind(Login.LoginResponse response) {
+        loggedIn = !response.hasError();
+        port = response.getPort();
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public int getPort() {
+        return port;
     }
 }
