@@ -1,8 +1,10 @@
 package com.morrisoncole.chat.login.integration;
 
 import client.TestLoginClient;
+import client.TestMessageClient;
 import container.DatastoreContainer;
 import container.LoginContainer;
+import container.PresenceContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -12,7 +14,6 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
@@ -22,7 +23,6 @@ class MessageIntegrationTest {
     private static final Slf4jLogConsumer LOG_CONSUMER = new Slf4jLogConsumer(LOGGER);
 
     private static final String A_TEST_USER_ID = "a test userId";
-    private static final String ANOTHER_TEST_USER_ID = "another test userId";
 
     private final Network network = Network.newNetwork();
 
@@ -38,37 +38,27 @@ class MessageIntegrationTest {
             .withNetwork(network)
             .withLogConsumer(LOG_CONSUMER);
 
+    @Container
+    private PresenceContainer presenceContainer = new PresenceContainer()
+            .withNetwork(network)
+            .withLogConsumer(LOG_CONSUMER);
+
     @BeforeEach
     void setup() {
         testLoginClient = aTestLoginClient();
     }
 
     @Test
-    void canLogin() {
+    void canSendMessage() {
         testLoginClient.Login(A_TEST_USER_ID);
 
-        assertTrue(testLoginClient.isLoggedIn());
-        assertTrue(testLoginClient.getUserSessionPort() > 0);
-    }
+        TestMessageClient testMessageClient = new TestMessageClient(
+                presenceContainer.getContainerIpAddress(),
+                presenceContainer.getMappedPort(testLoginClient.getUserSessionPort()));
 
-    @Test
-    void attemptToLoginWithUsedUserIdFails() {
-        testLoginClient.Login(A_TEST_USER_ID);
+        testMessageClient.SendMessage("a random message");
 
-        TestLoginClient anotherTestLoginClient = aTestLoginClient();
-        anotherTestLoginClient.Login(A_TEST_USER_ID);
-
-        assertFalse(anotherTestLoginClient.isLoggedIn());
-    }
-
-    @Test
-    void attemptToLoginWithUnusedUserIdSucceeds() {
-        testLoginClient.Login(A_TEST_USER_ID);
-
-        TestLoginClient anotherTestLoginClient = aTestLoginClient();
-        anotherTestLoginClient.Login(ANOTHER_TEST_USER_ID);
-
-        assertTrue(anotherTestLoginClient.isLoggedIn());
+        assertTrue(testMessageClient.successfullySentMessage());
     }
 
     private TestLoginClient aTestLoginClient() {

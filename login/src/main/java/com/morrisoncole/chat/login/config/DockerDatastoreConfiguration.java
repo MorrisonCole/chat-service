@@ -23,7 +23,6 @@ public class DockerDatastoreConfiguration implements DatastoreConfiguration {
 
             while (scanner.hasNextLine()) {
                 String[] pair = scanner.nextLine().split("=");
-                LOGGER.warning("scanned" + pair[0]);
                 configuration.put(pair[0], pair[1]);
             }
         } catch (FileNotFoundException e) {

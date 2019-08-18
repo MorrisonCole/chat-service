@@ -23,7 +23,8 @@ class UserSessionServer extends GrpcServer {
 
         @Override
         public void sendMessage(MessageOuterClass.Message request, StreamObserver<Empty> responseObserver) {
-            LOGGER.warning("Sent message: " + request.getMessage());
+            responseObserver.onNext(Empty.newBuilder().build());
+            responseObserver.onCompleted();
         }
     }
 }

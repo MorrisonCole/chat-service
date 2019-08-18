@@ -18,14 +18,14 @@ public class UserSessionOracleServer extends GrpcServer {
 
     private static class UserSessionOracleService extends SessionServiceImplBase {
 
-        private int lastUsedPort = 50999;
+        private int lastUsedPort = 51000;
 
         @Override
         public void startSession(Login.LoginRequest request, StreamObserver<Login.LoginResponse> responseObserver) {
             int port = getFreePort();
             new Thread(() -> {
                 try {
-                    UserSessionServer userSessionServer = new UserSessionServer("userId", port);
+                    UserSessionServer userSessionServer = new UserSessionServer(request.getUser().getUserId(), port);
                     userSessionServer.start();
                     userSessionServer.blockUntilShutdown();
                 } catch (IOException | InterruptedException e) {
