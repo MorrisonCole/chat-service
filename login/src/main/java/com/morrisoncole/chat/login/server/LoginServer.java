@@ -1,9 +1,11 @@
-package com.morrisoncole.chat.login;
+package com.morrisoncole.chat.login.server;
 
 import com.google.cloud.datastore.*;
+import com.google.cloud.datastore.StructuredQuery.PropertyFilter;
 import com.morrisoncole.chat.ErrorOuterClass;
 import com.morrisoncole.chat.Login;
 import com.morrisoncole.chat.LoginServiceGrpc.LoginServiceImplBase;
+import com.morrisoncole.chat.login.schema.User;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -59,13 +61,14 @@ public class LoginServer {
 
         LoginService(Datastore datastore) {
             this.datastore = datastore;
-            keyFactory = datastore.newKeyFactory().setKind("User");
+            keyFactory = datastore.newKeyFactory().setKind(User.KIND.toString());
         }
 
         @Override
         public void login(Login.LoginRequest request, StreamObserver<Login.LoginResponse> responseObserver) {
-            EntityQuery query = Query.newEntityQueryBuilder().setKind("User").build();
-            if (datastore.run(query).hasNext()) {
+            String userId = request.getUser().getUserId();
+
+            if (userExists(userId)) {
                 responseObserver.onNext(Login.LoginResponse.newBuilder()
                         .setError(ErrorOuterClass.Error.newBuilder().build())
                         .build());
@@ -75,12 +78,20 @@ public class LoginServer {
 
             IncompleteKey key = keyFactory.newKey();
             FullEntity<IncompleteKey> entity = Entity.newBuilder(key)
-                    .set("id", request.getUser().getUserId())
+                    .set(User.ID.toString(), userId)
                     .build();
             datastore.add(entity);
 
             responseObserver.onNext(Login.LoginResponse.newBuilder().build());
             responseObserver.onCompleted();
+        }
+
+        private boolean userExists(String userId) {
+            EntityQuery query = Query.newEntityQueryBuilder()
+                    .setKind(User.KIND.toString())
+                    .setFilter(PropertyFilter.eq(User.ID.toString(), userId))
+                    .build();
+            return datastore.run(query).hasNext();
         }
     }
 }

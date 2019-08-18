@@ -3,7 +3,6 @@ package com.morrisoncole.chat.login.integration;
 import com.morrisoncole.chat.login.integration.client.TestLoginClient;
 import com.morrisoncole.chat.login.integration.container.DatastoreContainer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,8 @@ import org.testcontainers.utility.MountableFile;
 
 import java.nio.file.Paths;
 
-import static com.morrisoncole.chat.login.config.DockerDatastoreConfiguration.*;
+import static com.morrisoncole.chat.login.config.DockerDatastoreConfiguration.DATASTORE_CONFIG_FILE_NAME;
+import static com.morrisoncole.chat.login.config.DockerDatastoreConfiguration.SECRETS_DIR;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -74,7 +74,6 @@ class LoginIntegrationTest {
     }
 
     @Test
-    @Disabled
     void attemptToLoginWithUnusedUserIdSucceeds() {
         testLoginClient.Login(A_TEST_USER_ID);
         boolean secondUserLoggedIn = testLoginClient.Login(ANOTHER_TEST_USER_ID);

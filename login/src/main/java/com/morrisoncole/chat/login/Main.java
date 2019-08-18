@@ -5,6 +5,7 @@ import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.morrisoncole.chat.login.config.DatastoreConfiguration;
 import com.morrisoncole.chat.login.config.DockerDatastoreConfiguration;
+import com.morrisoncole.chat.login.server.LoginServer;
 
 import java.io.FileInputStream;
 
