@@ -28,6 +28,7 @@ dependencies {
     testCompile("org.testcontainers", "junit-jupiter", "1.12.0")
 
     testCompile("org.awaitility", "awaitility", "3.1.6")
+    testCompile("org.hamcrest", "hamcrest-library", "2.1")
 }
 
 tasks {

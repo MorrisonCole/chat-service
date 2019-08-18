@@ -6,6 +6,7 @@ import container.DatastoreContainer;
 import container.LoginContainer;
 import container.PresenceContainer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +15,13 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInRelativeOrder;
+import static org.hamcrest.Matchers.equalTo;
 
 @Testcontainers
 class MessageIntegrationTest {
@@ -28,6 +30,7 @@ class MessageIntegrationTest {
     private static final Slf4jLogConsumer LOG_CONSUMER = new Slf4jLogConsumer(LOGGER);
 
     private static final String A_TEST_USER_ID = "a test userId";
+    private static final String ANOTHER_TEST_USER_ID = "another test userId";
 
     private final Network network = Network.newNetwork();
 
@@ -61,12 +64,13 @@ class MessageIntegrationTest {
                 presenceContainer.getContainerIpAddress(),
                 presenceContainer.getMappedPort(testLoginClient.getUserSessionPort()));
 
-        testMessageClient.SendMessage("a random message");
+        testMessageClient.sendMessage("a random message");
 
-        assertTrue(testMessageClient.successfullySentMessage());
+        assertThat(testMessageClient.successfullySentMessage(), equalTo(true));
     }
 
     @Test
+    @Disabled
     void receivesHistoricalMessagesUponLogin() {
         testLoginClient.Login(A_TEST_USER_ID);
 
@@ -74,10 +78,29 @@ class MessageIntegrationTest {
                 presenceContainer.getContainerIpAddress(),
                 presenceContainer.getMappedPort(testLoginClient.getUserSessionPort()));
 
-        testMessageClient.GetMessages();
+        ArrayList<String> expectedMessages = new ArrayList<String>() {
+            {
+                add("First message");
+                add("Second message");
+                add("Third message");
+            }
+        };
+
+        for (String expectedMessage : expectedMessages) {
+            testMessageClient.sendMessage(expectedMessage);
+        }
+
+        TestLoginClient anotherTestLoginClient = aTestLoginClient();
+        anotherTestLoginClient.Login(ANOTHER_TEST_USER_ID);
+
+        TestMessageClient anotherTestMessageClient = new TestMessageClient(
+                presenceContainer.getContainerIpAddress(),
+                presenceContainer.getMappedPort(anotherTestLoginClient.getUserSessionPort()));
+
+        anotherTestMessageClient.getMessages();
 
         await().atMost(5, SECONDS).untilAsserted(() -> {
-            assertEquals("Initial message", testMessageClient.getReceivedMessage());
+            assertThat(testMessageClient.getReceivedMessages(), containsInRelativeOrder(expectedMessages));
         });
     }
 

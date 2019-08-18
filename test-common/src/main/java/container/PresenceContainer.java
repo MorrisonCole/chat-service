@@ -13,7 +13,7 @@ public class PresenceContainer extends GenericContainer<PresenceContainer> {
                 .withFileFromPath(".", Paths.get("../presence"))
                 .withFileFromPath("Dockerfile", Paths.get("../presence/Dockerfile")));
 
-        withExposedPorts(50052, 51000);
+        withExposedPorts(50052, 51000, 51001);
         withNetworkAliases("presence");
         waitingFor(Wait.forLogMessage(".*started.*", 1));
     }

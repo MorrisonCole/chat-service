@@ -9,7 +9,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class TestMessageClient {
@@ -20,7 +20,7 @@ public class TestMessageClient {
     private final MessageServiceBlockingStub messageServiceBlockingStub;
 
     private boolean sentMessage = false;
-    private String receivedMessage;
+    private final ArrayList<String> receivedMessages = new ArrayList<>();
 
     public TestMessageClient(String host, int port) {
         ManagedChannel channel = ManagedChannelBuilder
@@ -31,7 +31,7 @@ public class TestMessageClient {
         messageServiceBlockingStub = MessageServiceGrpc.newBlockingStub(channel);
     }
 
-    public void SendMessage(String content) {
+    public void sendMessage(String content) {
         Message message = Message.newBuilder()
                 .setMessage(content)
                 .build();
@@ -45,11 +45,11 @@ public class TestMessageClient {
         }
     }
 
-    public void GetMessages() {
+    public void getMessages() {
         messageServiceStub.getMessages(Empty.newBuilder().build(), new StreamObserver<Message>() {
             @Override
             public void onNext(Message message) {
-                receivedMessage = message.getMessage();
+                receivedMessages.add(message.getMessage());
             }
 
             @Override
@@ -68,7 +68,7 @@ public class TestMessageClient {
         return sentMessage;
     }
 
-    public String getReceivedMessage() {
-        return receivedMessage;
+    public ArrayList<String> getReceivedMessages() {
+        return receivedMessages;
     }
 }
