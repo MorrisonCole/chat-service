@@ -12,12 +12,19 @@ services:
       - login-datastore-config
       - login-datastore-credentials
 
-#  presence-service:
-#    image: morrisoncole/chat-service:presence-service
-#    build: ./presence
+  presence-service:
+    image: morrisoncole/chat-service:presence-service
+    build: ./presence
+    secrets:
+      - message-datastore-config
+      - message-datastore-credentials
 
 secrets:
   login-datastore-config:
     file: ./.SECRET_LOGIN_DATASTORE_CONFIG
   login-datastore-credentials:
+    file: ./.SECRET_CHAT_SERVICE_ACCOUNT.json
+  message-datastore-config:
+    file: ./.SECRET_MESSAGE_DATASTORE_CONFIG
+  message-datastore-credentials:
     file: ./.SECRET_CHAT_SERVICE_ACCOUNT.json

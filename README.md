@@ -5,9 +5,9 @@ A scalable chat service built with Java, gRPC, & Docker.
 ### Production
 To deploy on GCP, you'll need a project set up along with a service account having read/write permissions.
 
-In the root of this project, create the two files:
+In the root of this project, create three files:
 * `.SECRET_CHAT_SERVICE_ACCOUNT.json` -> containing `.JSON` GCP service account credentials.
-* `.SECRET_LOGIN_DATASTORE_CONFIG` -> containing custom format as follows:
+* `.SECRET_LOGIN_DATASTORE_CONFIG` & `.SECRET_MESSAGE_DATASTORE_CONFIG`-> both containing the custom format as follows:
 ```
 projectId=my-gcp-project-id
 useCredentials=true
