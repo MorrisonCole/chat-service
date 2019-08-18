@@ -69,21 +69,13 @@ public class LoginServer {
             String userId = request.getUser().getUserId();
 
             if (userExists(userId)) {
-                responseObserver.onNext(Login.LoginResponse.newBuilder()
-                        .setError(ErrorOuterClass.Error.newBuilder().build())
-                        .build());
-                responseObserver.onCompleted();
+                respondWithError(responseObserver);
                 return;
             }
 
-            IncompleteKey key = keyFactory.newKey();
-            FullEntity<IncompleteKey> entity = Entity.newBuilder(key)
-                    .set(User.ID.toString(), userId)
-                    .build();
-            datastore.add(entity);
+            datastore.add(createUserWithId(userId));
 
-            responseObserver.onNext(Login.LoginResponse.newBuilder().build());
-            responseObserver.onCompleted();
+            respondWithSuccess(responseObserver);
         }
 
         private boolean userExists(String userId) {
@@ -92,6 +84,25 @@ public class LoginServer {
                     .setFilter(PropertyFilter.eq(User.ID.toString(), userId))
                     .build();
             return datastore.run(query).hasNext();
+        }
+
+        private void respondWithError(StreamObserver<Login.LoginResponse> responseObserver) {
+            responseObserver.onNext(Login.LoginResponse.newBuilder()
+                    .setError(ErrorOuterClass.Error.newBuilder().build())
+                    .build());
+            responseObserver.onCompleted();
+        }
+
+        private FullEntity<IncompleteKey> createUserWithId(String userId) {
+            IncompleteKey key = keyFactory.newKey();
+            return Entity.newBuilder(key)
+                    .set(User.ID.toString(), userId)
+                    .build();
+        }
+
+        private void respondWithSuccess(StreamObserver<Login.LoginResponse> responseObserver) {
+            responseObserver.onNext(Login.LoginResponse.newBuilder().build());
+            responseObserver.onCompleted();
         }
     }
 }
