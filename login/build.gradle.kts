@@ -18,6 +18,8 @@ dependencies {
     compile("io.grpc", "grpc-stub", "1.23.0")
     compile("io.grpc", "grpc-netty", "1.23.0")
 
+    testCompile(project(":test-common"))
+
     testCompile("org.junit.jupiter", "junit-jupiter-api", "5.5.1")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.5.1")
     testRuntimeOnly("org.slf4j", "slf4j-simple", "1.7.28")

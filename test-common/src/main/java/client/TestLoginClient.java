@@ -1,4 +1,4 @@
-package com.morrisoncole.chat.login.integration.client;
+package client;
 
 import com.morrisoncole.chat.Login;
 import com.morrisoncole.chat.Login.LoginRequest;

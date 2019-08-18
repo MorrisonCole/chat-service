@@ -1,4 +1,4 @@
-package com.morrisoncole.chat.login.integration;
+package com.morrisoncole.chat;
 
 import client.TestLoginClient;
 import container.DatastoreContainer;
@@ -12,17 +12,15 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
-class LoginIntegrationTest {
+class LoginAcceptanceTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginIntegrationTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginAcceptanceTest.class);
     private static final Slf4jLogConsumer LOG_CONSUMER = new Slf4jLogConsumer(LOGGER);
-
-    private static final String A_TEST_USER_ID = "a test userId";
-    private static final String ANOTHER_TEST_USER_ID = "another test userId";
 
     private final Network network = Network.newNetwork();
 
@@ -47,25 +45,17 @@ class LoginIntegrationTest {
     }
 
     @Test
-    void canLogin() {
-        boolean loggedIn = testLoginClient.Login(A_TEST_USER_ID);
+    void canHandleAtLeast1000RegisteredUsers() {
+        int targetLoggedInUsers = 1000;
 
-        assertTrue(loggedIn);
-    }
+        int actualLoggedInUsers = 0;
+        for (int i = 0; i < targetLoggedInUsers; i++) {
+            boolean loggedIn = testLoginClient.Login(UUID.randomUUID().toString());
+            if (loggedIn) {
+                actualLoggedInUsers++;
+            }
+        }
 
-    @Test
-    void attemptToLoginWithUsedUserIdFails() {
-        testLoginClient.Login(A_TEST_USER_ID);
-        boolean secondUserLoggedIn = testLoginClient.Login(A_TEST_USER_ID);
-
-        assertFalse(secondUserLoggedIn);
-    }
-
-    @Test
-    void attemptToLoginWithUnusedUserIdSucceeds() {
-        testLoginClient.Login(A_TEST_USER_ID);
-        boolean secondUserLoggedIn = testLoginClient.Login(ANOTHER_TEST_USER_ID);
-
-        assertTrue(secondUserLoggedIn);
+        assertEquals(targetLoggedInUsers, actualLoggedInUsers);
     }
 }

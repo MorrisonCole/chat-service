@@ -3,5 +3,6 @@ include(
         "login",
         "presence",
         "protos",
-        "integration-tests"
+        "acceptance-tests",
+        "test-common"
 )

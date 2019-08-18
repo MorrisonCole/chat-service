@@ -1,4 +1,4 @@
-package com.morrisoncole.chat.login.integration.container;
+package container;
 
 import com.google.cloud.NoCredentials;
 import com.google.cloud.datastore.Datastore;
@@ -8,19 +8,21 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 public class DatastoreContainer extends GenericContainer<DatastoreContainer> {
 
-    private static final String NETWORK_ALIAS = "datastore";
+    private final String networkAlias;
     private static final int PORT = 8888;
-    private static final String PROJECT_NAME = "testing";
+    private final String projectName;
 
-    public DatastoreContainer() {
+    public DatastoreContainer(String prefix) {
         super("google/cloud-sdk:latest");
+        networkAlias = prefix + "datastore";
+        projectName = prefix + "testdatastore";
 
         withExposedPorts(PORT);
-        withNetworkAliases(NETWORK_ALIAS);
+        withNetworkAliases(networkAlias);
         withCommand("/bin/sh",
                 "-c",
                 String.format("gcloud beta emulators datastore start --no-legacy --project %s --host-port=0.0.0.0:%d --consistency=1",
-                        PROJECT_NAME,
+                        projectName,
                         PORT)
         );
         waitingFor(Wait.forHttp(""));
@@ -30,7 +32,7 @@ public class DatastoreContainer extends GenericContainer<DatastoreContainer> {
         String host = String.format("%s:%d", getContainerIpAddress(), getMappedPort(PORT));
 
         return DatastoreOptions.newBuilder()
-                .setProjectId(PROJECT_NAME)
+                .setProjectId(projectName)
                 .setHost(host)
                 .setCredentials(NoCredentials.getInstance())
                 .build()
