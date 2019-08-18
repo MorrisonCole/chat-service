@@ -6,6 +6,7 @@ import container.DatastoreContainer;
 import container.LoginContainer;
 import container.PresenceContainer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.equalTo;
 
 @Testcontainers
@@ -103,6 +103,42 @@ class MessageIntegrationTest {
         anotherTestMessageClient.getMessages();
 
         await().atMost(5, SECONDS).untilAsserted(() -> {
+            assertThat(anotherTestMessageClient.getReceivedMessages(), equalTo(expectedMessages));
+        });
+
+        assertThat(anotherTestMessageClient.getReceivedMessages(), equalTo(expectedMessages));
+    }
+
+    @Test
+    @Disabled
+    void receivesMessagesFromOtherUsersWithinASecond() {
+        testLoginClient.Login(A_TEST_USER_ID);
+
+        TestMessageClient testMessageClient = new TestMessageClient(
+                presenceContainer.getContainerIpAddress(),
+                presenceContainer.getMappedPort(testLoginClient.getUserSessionPort()));
+
+        ArrayList<String> expectedMessages = new ArrayList<String>() {
+            {
+                add("hello user 2");
+                add("how are you?");
+            }
+        };
+
+        TestLoginClient anotherTestLoginClient = aTestLoginClient();
+        anotherTestLoginClient.Login(ANOTHER_TEST_USER_ID);
+
+        TestMessageClient anotherTestMessageClient = new TestMessageClient(
+                presenceContainer.getContainerIpAddress(),
+                presenceContainer.getMappedPort(anotherTestLoginClient.getUserSessionPort()));
+
+        anotherTestMessageClient.getMessages();
+
+        for (String expectedMessage : expectedMessages) {
+            testMessageClient.sendMessage(expectedMessage);
+        }
+
+        await().atMost(1, SECONDS).untilAsserted(() -> {
             assertThat(anotherTestMessageClient.getReceivedMessages(), equalTo(expectedMessages));
         });
 
