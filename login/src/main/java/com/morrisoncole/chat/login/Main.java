@@ -7,13 +7,10 @@ import com.morrisoncole.chat.login.config.DatastoreConfiguration;
 import com.morrisoncole.chat.login.config.DockerDatastoreConfiguration;
 
 import java.io.FileInputStream;
-import java.util.logging.Logger;
 
 import static com.google.auth.oauth2.ServiceAccountCredentials.fromStream;
 
 public class Main {
-
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private static final DatastoreConfiguration configuration = new DockerDatastoreConfiguration();
 

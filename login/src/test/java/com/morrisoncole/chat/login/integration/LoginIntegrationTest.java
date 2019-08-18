@@ -1,7 +1,9 @@
-package com.morrisoncole.chat.login;
+package com.morrisoncole.chat.login.integration;
 
-import com.morrisoncole.chat.login.container.DatastoreContainer;
+import com.morrisoncole.chat.login.integration.client.TestLoginClient;
+import com.morrisoncole.chat.login.integration.container.DatastoreContainer;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ class LoginIntegrationTest {
     private static final Slf4jLogConsumer LOG_CONSUMER = new Slf4jLogConsumer(LOGGER);
 
     private static final String A_TEST_USER_ID = "a test userId";
+    private static final String ANOTHER_TEST_USER_ID = "another test userId";
 
     private final Network network = Network.newNetwork();
 
@@ -63,10 +66,19 @@ class LoginIntegrationTest {
     }
 
     @Test
-    void attemptToLoginWithTakenUserIdFails() {
+    void attemptToLoginWithUsedUserIdFails() {
         testLoginClient.Login(A_TEST_USER_ID);
         boolean secondUserLoggedIn = testLoginClient.Login(A_TEST_USER_ID);
 
         assertFalse(secondUserLoggedIn);
+    }
+
+    @Test
+    @Disabled
+    void attemptToLoginWithUnusedUserIdSucceeds() {
+        testLoginClient.Login(A_TEST_USER_ID);
+        boolean secondUserLoggedIn = testLoginClient.Login(ANOTHER_TEST_USER_ID);
+
+        assertTrue(secondUserLoggedIn);
     }
 }

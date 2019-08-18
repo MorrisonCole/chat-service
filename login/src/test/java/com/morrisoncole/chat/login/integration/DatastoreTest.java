@@ -1,9 +1,9 @@
-package com.morrisoncole.chat.login;
+package com.morrisoncole.chat.login.integration;
 
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.Key;
 import com.google.cloud.datastore.KeyFactory;
-import com.morrisoncole.chat.login.container.DatastoreContainer;
+import com.morrisoncole.chat.login.integration.container.DatastoreContainer;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.morrisoncole.chat.login.container;
+package com.morrisoncole.chat.login.integration.container;
 
 import com.google.cloud.NoCredentials;
 import com.google.cloud.datastore.Datastore;
