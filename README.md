@@ -22,3 +22,6 @@ useCredentials=true
 
 ### Run
 `docker-compose up --build`
+
+## Architecture
+![System architecture](architecture.png)
